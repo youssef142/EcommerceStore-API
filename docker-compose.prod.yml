@@ -1,0 +1,18 @@
+# docker-compose.prod.yml
+services:
+  app:
+    build:
+      target: production
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      Jwt__Key: ${JWT_KEY:?JWT_KEY is required}
+      ConnectionStrings__SqliteConnection: "Data Source=/app/data/ecommerce.db"
+      Cors__Origins__0: ${CORS_ORIGIN:?CORS_ORIGIN is required}
+    volumes:
+      - uploads:/app/wwwroot/uploads
+      - dbdata:/app/data
+
+volumes:
+  uploads:
+  dbdata:

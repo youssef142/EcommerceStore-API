@@ -1,0 +1,32 @@
+services:
+  app:
+    build:
+      target: development
+    env_file:
+      - ./.env.app.dev
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./EcommerceStore:/src/EcommerceStore
+      - /src/EcommerceStore/bin
+      - /src/EcommerceStore/obj
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    env_file:
+      - ./.env.db.dev
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" || exit 1
+      interval: 10s
+      retries: 10
+      start_period: 20s
+
+volumes:
+  sqldata:
